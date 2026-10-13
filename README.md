@@ -1,58 +1,98 @@
 # Plan B
 
-A React household assistant that helps people coordinate when plans change. This version uses actual account identities and information entered by the household. There is no seeded calendar, sample family, or simulated reply switch.
+Plan B keeps your household’s plans in one place. If you’re running late, tell it when you’ll be free again. It checks the calendar, suggests who could help, and lets you review the requests before anyone is asked.
 
-## What works
+When someone says yes, their name goes on the calendar. If they can’t make it, Plan B looks for another option. You can check the replies whenever you need an update.
 
-- Email/password accounts and confirmation, using Supabase Auth.
-- Empty household setup with your own name, household name, and availability.
-- Members and invitations bound to the intended email address, expiring after seven days.
-- A shared calendar, household notes, approvals, and a request inbox.
-- Each signed-in member can respond only to their own requests. The owner cannot impersonate them.
-- Permission and availability checks, including travel buffers for school pickups and prevention of double booking.
-- Declines create a new suggestion that requires owner approval. Acceptance updates the shared calendar.
-- Saved conversations and household data. Other members’ changes refresh automatically.
-- Browser dictation and read-aloud on supported browsers.
+## What you need to get started
 
-The frontend is React 19 with Next.js 16 and TypeScript. The backend uses Supabase Postgres and Auth. Optional AI interpretation uses AI SDK 7 and Vercel AI Gateway. The standard Next.js project can run locally or be connected to Vercel.
+- **Node.js 22.13 or later and pnpm** to run the app on your computer.
+- **A Supabase project** for accounts and saved household data.
+- **The Supabase URL, publishable key, and server secret key** from that project.
+- **An AI Gateway key and model name** if you want AI to understand more ways of asking for help.
+- **A Vercel project** if you want to put the app online.
 
-## Run locally
+You can use the calendar planner without an AI key. It understands return times, checks replies, and saves notes. Accounts and shared data still need Supabase.
 
-Requires Node 22.13+ and pnpm.
+## Run it on your computer
+
+Install the packages:
 
 ```sh
 pnpm install --frozen-lockfile
 ```
 
-Copy `.env.example` to `.env.local`, then configure the Supabase URL, publishable key, and **server-only** secret key. Use a dedicated Plan B Supabase project and run [supabase/schema.sql](supabase/schema.sql) in its SQL editor once. This schema is not applied to any existing account automatically.
+Copy `.env.example` to `.env.local`. On Windows, you can use:
 
-In Supabase Auth URL settings, set the Site URL to your app origin, and add the app’s `/auth/callback**` pattern to allowed redirects so invitation return paths work. Locally this is `http://localhost:3000/auth/callback**`. Keep email confirmation enabled.
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Fill in these values in `.env.local`:
+
+| Variable                               | What to put there                                   |
+| -------------------------------------- | --------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Your Supabase project URL                           |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The project’s publishable key                       |
+| `SUPABASE_SECRET_KEY`                  | Its server secret key, or legacy `service_role` key |
+| `AI_GATEWAY_API_KEY`                   | Your AI Gateway key, if you’re connecting AI        |
+| `AI_GATEWAY_MODEL`                     | A text model that supports structured output        |
+
+Keep the secret keys in environment settings. Don’t commit `.env.local` or put those keys in browser code. The two `NEXT_PUBLIC_` values are the only ones meant for the browser.
+
+Use a separate Supabase project for Plan B. Run [supabase/schema.sql](supabase/schema.sql) once in its SQL editor to create the tables and invitation functions.
+
+In **Supabase → Authentication → URL Configuration**:
+
+1. Set the Site URL to `http://localhost:3000`.
+2. Add `http://localhost:3000/auth/callback**` to the allowed redirect URLs. The ending allows the app to bring someone back to their invitation after confirming their email.
+3. Keep email confirmation enabled.
+
+Then start the app:
 
 ```sh
 pnpm dev
 ```
 
-Create an account, confirm your email, and sign in. Start a household, enter your tasks and members, and give each member their invitation link. They must create/confirm an account using the exact invited email address and explicitly join. Unjoined people are not eligible for coverage.
+Open `http://localhost:3000`, create an account, and confirm your email.
 
-For a hosted deployment, set the same variables in Vercel, connect this repository, and configure the production auth callback URL. No new public deployment is created by this repository push.
+## Set up your household
 
-## AI connection
+Start with your name, your household’s name, and the hours you’re usually free. The calendar and notes start empty.
 
-Set `AI_GATEWAY_API_KEY` and `AI_GATEWAY_MODEL` as server environment variables to enable model interpretation. Use a current structured-output text model from `https://ai-gateway.vercel.sh/v1/models`.
+Add your people and tasks. For each person, enter the email address they’ll use to sign in. Make an invitation link and send it to them. The link lasts seven days, and making a new one replaces the old one.
 
-Without a model connection, the calendar planner supports explicit return times, status questions, and household notes. It identifies itself as a calendar planner. It asks for a return time rather than guessing one. If a connected model fails, the UI identifies a fallback to calendar rules.
+Each person needs to accept their invitation before Plan B can suggest them for a task. They can then set their own free hours and reply to requests sent to them. The household owner manages plans, notes, and permissions. Everyone can belong to one household.
 
-The model returns a validated intent. The backend applies availability and permission checks independently. It cannot grant pickup permissions, approve plans, impersonate recipients, or claim a task was accepted without the actual reply.
+School pickups need permission and 15 minutes on either side for travel. Deliveries need someone who’s marked as home. Anything already on the calendar counts as busy time.
 
-## Data and access
+Try a message such as **“I’m stuck at work until 6 pm.”** Plan B will check the tasks you’ll miss and suggest a new plan. Review it, choose who to ask, and check their replies in **Requests**. Only the person receiving a request can answer it.
 
-The verified Supabase account determines household membership. Each user can belong to one household. The owner manages the calendar, notes, plans, and permissions; members can update their own availability and reply to their own requests.
+## Connect AI
 
-Data tables and invitation RPCs have RLS enabled and no browser-role grants. Only authenticated Next.js routes use the server credential after verifying identity and membership. Invitation codes are stored as SHA-256 hashes. Creation and acceptance are database transactions. Household updates use version checks to detect concurrent writes. Public-facing responses containing account data are not cached.
+Add `AI_GATEWAY_API_KEY` and `AI_GATEWAY_MODEL` to your server environment settings. You can find current model names at [the AI Gateway model list](https://ai-gateway.vercel.sh/v1/models). Choose a text model that supports structured output.
 
-Calendar tasks are entered in the app, using Lagos time (WAT). An external Google/Outlook calendar, email notification service, and actual Alexa device integration are not connected. Voice input uses the browser’s speech service. The Alexa+ hackathon’s simulated web-experience route can use this app, but live model credentials and the usual submission materials must be supplied before presenting it as an AI-connected entry.
+AI helps understand your message. The planner still checks people’s free hours and permissions, and you still review the requests. If AI doesn’t respond, the app tells you and uses the basic planner for that message.
 
-## Checks
+## Put it online
+
+Import this repository into Vercel and add the same environment values. Update the Supabase Site URL and allowed callback URL to match your live app’s address. Use `/auth/callback**` at the end of the callback pattern, as above.
+
+The GitHub push doesn’t deploy the app by itself. Supabase and AI also need their own setup; the repository doesn’t contain working keys.
+
+## What’s connected so far
+
+The app has account setup, invitations, a shared calendar, household notes, approvals, and replies. Changes refresh automatically. Voice input and read-aloud use your browser, where supported.
+
+Tasks are entered in Plan B and use Lagos time, WAT. Google and Outlook calendars, email notifications, and an actual Alexa device connection still need separate integrations. For the Alexa+ hackathon, this is the simulated web experience route. A submission also needs a working AI connection, a short demo video, and product feedback.
+
+## For anyone working on the code
+
+The app uses React 19, Next.js 16, TypeScript, and Supabase. AI calls go through AI SDK 7 and Vercel AI Gateway.
+
+The server verifies the signed-in account before reading or changing household data. Browser accounts have no direct access to the database tables or invitation functions. Invitation codes are stored as hashes, and joining a household happens in a transaction. Version checks prevent one person’s update from quietly overwriting someone else’s.
+
+Run the checks with:
 
 ```sh
 pnpm test
@@ -60,4 +100,4 @@ pnpm typecheck
 pnpm build
 ```
 
-Tests cover planning, approvals, replacement suggestions, actual-account reply authorization, and the schema’s invitation and permission behavior in an embedded PostgreSQL engine. Test fixtures are used only by tests. Live Supabase authentication and a live model call require configured services and are separate from these local checks.
+The tests cover planning, approvals, replies, permissions, and invitations. Database tests use an embedded PostgreSQL engine. Live sign-in and model calls need connected services to test them end to end. Sample names and plans appear only in test fixtures.

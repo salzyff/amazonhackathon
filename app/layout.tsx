@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Plan B · A little help when life happens",
-  description: "A shared household assistant. Make a new plan, check everyone's availability, and keep the day moving.",
+  title: "Plan B · When plans change",
+  description:
+    "Keep your household’s plans in one place. When something changes, see who’s free and ask for a hand.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
