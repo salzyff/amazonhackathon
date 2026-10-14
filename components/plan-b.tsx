@@ -963,9 +963,11 @@ export default function PlanB() {
                     <span className="green-dot" />
                     {engine === "ai"
                       ? "AI is helping"
-                      : engine === "ready"
-                        ? "AI is connected"
-                        : "Basic planner"}
+                      : engine === "gemini"
+                        ? "Gemini is connected"
+                        : engine === "ready"
+                          ? "AI is connected"
+                          : "Basic planner"}
                   </span>
                 </div>
               </div>

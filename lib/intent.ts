@@ -1,4 +1,5 @@
 import { createGateway, generateText, Output } from "ai";
+import { createGoogle } from "@ai-sdk/google";
 import { z } from "zod";
 import { parseIntent, type Household, type Intent } from "./household";
 
@@ -9,7 +10,10 @@ const schema = z.object({
   memory: z.string().max(500).nullable(),
 });
 export function aiConfigured() {
-  return Boolean(process.env.AI_GATEWAY_API_KEY && process.env.AI_GATEWAY_MODEL);
+  return Boolean(
+    (process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL) ||
+    (process.env.AI_GATEWAY_API_KEY && process.env.AI_GATEWAY_MODEL),
+  );
 }
 export async function interpret(
   text: string,
@@ -17,9 +21,12 @@ export async function interpret(
 ): Promise<{ intent: Intent; engine: string; notice?: string }> {
   if (!aiConfigured()) return { intent: parseIntent(text), engine: "rules" };
   try {
-    const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
+    const model =
+      process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL
+        ? createGoogle({ apiKey: process.env.GEMINI_API_KEY })(process.env.GEMINI_MODEL)
+        : createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY })(process.env.AI_GATEWAY_MODEL!);
     const { output } = await generateText({
-      model: gateway(process.env.AI_GATEWAY_MODEL!),
+      model,
       output: Output.object({ schema }),
       maxOutputTokens: 700,
       maxRetries: 0,
@@ -41,7 +48,7 @@ export async function interpret(
         targets: output.targets,
         memory: output.memory ?? undefined,
       },
-      engine: "ai",
+      engine: process.env.GEMINI_API_KEY ? "gemini" : "ai",
     };
   } catch {
     return {

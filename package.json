@@ -14,6 +14,7 @@
     "format": "prettier --write app components/plan-b.tsx components/account.tsx lib tests README.md package.json .prettierrc.json"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.90",
     "@base-ui/react": "^1.7.0",
     "@hookform/resolvers": "^5.7.1",
     "@shadcn/react": "^0.3.0",

@@ -9,7 +9,7 @@ When someone says yes, their name goes on the calendar. If they can’t make it,
 - **Node.js 22.13 or later and pnpm** to run the app on your computer.
 - **A Supabase project** for accounts and saved household data.
 - **The Supabase URL, publishable key, and server secret key** from that project.
-- **An AI Gateway key and model name** if you want AI to understand more ways of asking for help.
+- **A Gemini API key and model name** if you want the assistant to understand more natural ways of asking for help. A free Google AI Studio key is enough for testing.
 - **A Vercel project** if you want to put the app online.
 
 You can use the calendar planner without an AI key. It understands return times, checks replies, and saves notes. Accounts and shared data still need Supabase.
@@ -35,8 +35,10 @@ Fill in these values in `.env.local`:
 | `NEXT_PUBLIC_SUPABASE_URL`             | Your Supabase project URL                           |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The project’s publishable key                       |
 | `SUPABASE_SECRET_KEY`                  | Its server secret key, or legacy `service_role` key |
-| `AI_GATEWAY_API_KEY`                   | Your AI Gateway key, if you’re connecting AI        |
-| `AI_GATEWAY_MODEL`                     | A text model that supports structured output        |
+| `GEMINI_API_KEY`                       | Your Google AI Studio key                           |
+| `GEMINI_MODEL`                         | A Gemini model, such as `gemini-2.5-flash`          |
+| `AI_GATEWAY_API_KEY`                   | Optional Vercel AI Gateway key                      |
+| `AI_GATEWAY_MODEL`                     | Optional Gateway model                              |
 
 Keep the secret keys in environment settings. Don’t commit `.env.local` or put those keys in browser code. The two `NEXT_PUBLIC_` values are the only ones meant for the browser.
 
@@ -68,11 +70,11 @@ School pickups need permission and 15 minutes on either side for travel. Deliver
 
 Try a message such as **“I’m stuck at work until 6 pm.”** Plan B will check the tasks you’ll miss and suggest a new plan. Review it, choose who to ask, and check their replies in **Requests**. Only the person receiving a request can answer it.
 
-## Connect AI
+## Connect Gemini
 
-Add `AI_GATEWAY_API_KEY` and `AI_GATEWAY_MODEL` to your server environment settings. You can find current model names at [the AI Gateway model list](https://ai-gateway.vercel.sh/v1/models). Choose a text model that supports structured output.
+Create a key in [Google AI Studio](https://aistudio.google.com/apikey), then add `GEMINI_API_KEY` and `GEMINI_MODEL` to your local `.env.local` or Vercel environment. `gemini-2.5-flash` is a good starting model. Keep the key on the server; never add it to a `NEXT_PUBLIC_` variable.
 
-AI helps understand your message. The planner still checks people’s free hours and permissions, and you still review the requests. If AI doesn’t respond, the app tells you and uses the basic planner for that message.
+Gemini helps understand the message. Plan B still checks free hours, permissions, and calendar conflicts, and you review every request before it is sent. If Gemini is unavailable or you leave these values empty, the basic planner still works.
 
 ## Put it online
 
@@ -88,7 +90,7 @@ Tasks are entered in Plan B and use Lagos time, WAT. Google and Outlook calendar
 
 ## For anyone working on the code
 
-The app uses React 19, Next.js 16, TypeScript, and Supabase. AI calls go through AI SDK 7 and Vercel AI Gateway.
+The app uses React 19, Next.js 16, TypeScript, and Supabase. AI calls use AI SDK 7 with Gemini or an optional Vercel AI Gateway connection.
 
 The server verifies the signed-in account before reading or changing household data. Browser accounts have no direct access to the database tables or invitation functions. Invitation codes are stored as hashes, and joining a household happens in a transaction. Version checks prevent one person’s update from quietly overwriting someone else’s.
 
