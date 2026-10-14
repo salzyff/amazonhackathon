@@ -43,15 +43,13 @@ export async function POST(request: Request) {
       .eq("household_id", row.id)
       .eq("member_id", member.id);
     if (revokeError) throw revokeError;
-    const { error } = await db
-      .from("planb_invites")
-      .insert({
-        token_hash: tokenHash,
-        household_id: row.id,
-        member_id: member.id,
-        email: member.email.toLowerCase(),
-        expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
-      });
+    const { error } = await db.from("planb_invites").insert({
+      token_hash: tokenHash,
+      household_id: row.id,
+      member_id: member.id,
+      email: member.email.toLowerCase(),
+      expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+    });
     if (error) throw error;
     return json({ url: `${new URL(request.url).origin}/join?token=${token}`, email: member.email });
   } catch {

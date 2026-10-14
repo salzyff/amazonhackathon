@@ -382,7 +382,7 @@ export default function PlanB() {
           </span>
           <div>
             <strong>{state?.name ?? "Your household"}</strong>
-            <span>Everyone’s plans, in one place</span>
+            <span>Your household plans</span>
           </div>
         </div>
         <span className="nav-label">YOUR SPACE</span>
@@ -441,7 +441,7 @@ export default function PlanB() {
           <div className="topbar-right">
             <span className="connection-tag">
               <span />
-              Household assistant
+              Household help
             </span>
             {state && (
               <div className="avatar-stack">
@@ -492,10 +492,10 @@ export default function PlanB() {
                         : view === "calendar"
                           ? "EVERYONE’S PLANS, TOGETHER"
                           : view === "requests"
-                            ? "A LITTLE HELP GOES BOTH WAYS"
+                            ? "REQUESTS FROM YOUR HOUSEHOLD"
                             : view === "household"
                               ? "YOUR PEOPLE"
-                              : "THE SMALL THINGS THAT MATTER"}
+                              : "NOTES FOR YOUR HOUSEHOLD"}
                     </p>
                     <h1>
                       {view === "today"
@@ -512,11 +512,11 @@ export default function PlanB() {
                       {view === "today"
                         ? "See what’s coming up and who can help if plans change."
                         : view === "calendar"
-                          ? "See who’s doing what, and where there’s room to help."
+                          ? "See what everyone is doing and where help is needed."
                           : view === "requests"
                             ? "Check who’s replied and what still needs sorting."
                             : view === "household"
-                              ? "Add your people, their free hours, and what they can help with."
+                              ? "Add people, set their free hours, and choose what they can help with."
                               : "Keep the notes you’d otherwise have to ask about again."}
                     </p>
                   </div>
@@ -538,7 +538,7 @@ export default function PlanB() {
                     <section className="hero-card">
                       <div className="hero-copy">
                         <span className="overline">
-                          <span className="mini-spark">✳</span> WHEN THE DAY DOESN’T GO TO PLAN
+                          <span className="mini-spark">✳</span> WHEN PLANS CHANGE
                         </span>
                         <h2>
                           Running late?
@@ -547,7 +547,7 @@ export default function PlanB() {
                         </h2>
                         <p>
                           Tell me what changed and when you’ll be free.
-                          <br className="desktop-break" /> I’ll check who can give you a hand.
+                          <br className="desktop-break" /> I’ll check who is free.
                         </p>
                         <button
                           className="button dark"
@@ -558,7 +558,7 @@ export default function PlanB() {
                             setInput("");
                           }}
                         >
-                          Help me sort this out <ArrowUpRight size={17} />
+                          Work out a new plan <ArrowUpRight size={17} />
                         </button>
                       </div>
                       <div className="hero-art" aria-hidden="true">
@@ -618,7 +618,7 @@ export default function PlanB() {
                         <span className="art-caption">
                           A few changes.
                           <br />
-                          Everyone in the loop.
+                          No one has to guess what changed.
                         </span>
                       </div>
                     </section>
@@ -685,7 +685,7 @@ export default function PlanB() {
                           <span>
                             {activePlan
                               ? `${confirmed} confirmed · ${pending} waiting for a reply`
-                              : "We’ll keep the moving parts here."}
+                              : "Any requests will show up here."}
                           </span>
                         </div>
                         <span className="subtle-pill">
@@ -720,7 +720,7 @@ export default function PlanB() {
                     <div className="bottom-note">
                       <ShieldCheck size={15} />
                       <span>You review the plan before anyone gets a request.</span>
-                      <span className="bottom-note-right">One less thing to chase.</span>
+                      <span className="bottom-note-right">Everything stays in one place.</span>
                     </div>
                   </>
                 )}
@@ -770,8 +770,8 @@ export default function PlanB() {
                     <div className="simulation-note">
                       <Sparkles size={17} />
                       <div>
-                        <strong>Waiting for a reply?</strong>
-                        <p>Each person answers their own requests after signing in.</p>
+                        <strong>Waiting on a reply?</strong>
+                        <p>Each person can answer their own request after signing in.</p>
                       </div>
                     </div>
                     {state.plans.some((p) => p.status !== "cancelled") ? (
@@ -938,7 +938,7 @@ export default function PlanB() {
                       onClick={() => setModal("memory")}
                     >
                       <Plus size={19} />
-                      Add something to remember
+                      Add a note
                     </button>
                   </>
                 )}
@@ -950,7 +950,7 @@ export default function PlanB() {
 
           <aside
             className={`assistant-panel ${chatOpen ? "mobile-open" : ""}`}
-            aria-label="Household assistant"
+            aria-label="Household help"
           >
             <div className="assistant-header">
               <div>
@@ -958,14 +958,14 @@ export default function PlanB() {
                   <Sparkles size={17} />
                 </span>
                 <div>
-                  <h2>Need a hand?</h2>
+                  <h2>Ask for help</h2>
                   <span>
                     <span className="green-dot" />
                     {engine === "ai"
-                      ? "AI assisted"
+                      ? "AI is helping"
                       : engine === "ready"
-                        ? "AI is set up"
-                        : "Calendar planner"}
+                        ? "AI is connected"
+                        : "Basic planner"}
                   </span>
                 </div>
               </div>
@@ -985,11 +985,11 @@ export default function PlanB() {
               </button>
             </div>
             <div className="assistant-intro">
-              <span className="little-label">LET’S SORT IT OUT</span>
+              <span className="little-label">TELL ME WHAT CHANGED</span>
               <p>
                 Tell me what’s changed.
                 <br />
-                We’ll take it from there.
+                I’ll check what needs to change.
               </p>
             </div>
             <div className="chat-feed" aria-live="polite">
@@ -1118,13 +1118,13 @@ export default function PlanB() {
               </form>
               <p className="composer-disclaimer">
                 {ai
-                  ? "AI interprets your request. You approve every change."
+                  ? "AI helps understand your message. You approve every change."
                   : "Saved household data · replies from signed-in members"}
               </p>
             </div>
             <div className="assistant-footer">
               <Leaf size={13} />
-              <span>We’ll keep track of the replies.</span>
+              <span>I’ll keep the replies here.</span>
             </div>
           </aside>
         </div>
@@ -1136,7 +1136,7 @@ export default function PlanB() {
         aria-label="Open assistant"
       >
         <Sparkles size={21} />
-        Need a hand?
+        Ask for help
       </button>
       {toast && (
         <div role="status" className="toast">
@@ -1170,7 +1170,7 @@ export default function PlanB() {
               <div className="settings-status">
                 <Sparkles size={23} />
                 <div>
-                  <h3>{ai ? "AI is set up" : "AI isn’t connected yet"}</h3>
+                  <h3>{ai ? "AI is connected" : "AI isn’t connected yet"}</h3>
                   <p>
                     {ai
                       ? "I’ll use AI to understand your message, then check everyone’s free hours and permissions before suggesting a plan."
@@ -1690,7 +1690,7 @@ function MemoryForm({ busy, onSave }: { busy: boolean; onSave: (text: string) =>
       }}
     >
       <label>
-        Add something to remember
+        Add a note
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}

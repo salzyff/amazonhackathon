@@ -162,7 +162,7 @@ export function createHousehold(
       {
         id: uid(),
         role: "assistant",
-        text: `Hi ${name}. Start by adding your people and today’s plans. When something changes, tell me when you’ll be free and I’ll check who can help.`,
+        text: `Hi ${name}. Add your people and today’s plans first. If something changes, tell me when you’ll be free and I’ll check who can help.`,
         createdAt: now(),
       },
     ],
@@ -276,7 +276,7 @@ function statusText(s: Household) {
     const m = s.members.find((x) => x.id === a.memberId);
     return `${e?.title}: ${a.status === "accepted" ? `confirmed with ${m?.name}` : a.status === "waiting" ? `waiting for ${m?.name} to reply` : a.status === "blocked" ? "still needs someone available" : `a suggestion for ${m?.name}, waiting for your approval`}.`;
   });
-  return `${current.every((a) => a.status === "accepted") ? "Everyone’s confirmed. The new plan is sorted." : "Here’s the latest:"}\n\n${lines.join("\n")}`;
+  return `${current.every((a) => a.status === "accepted") ? "Everyone has confirmed. The plan is sorted." : "Here’s where things stand:"}\n\n${lines.join("\n")}`;
 }
 export function propose(s: Household, source: string, intent: Intent) {
   const until = intent.until ?? 1080;
@@ -340,7 +340,7 @@ export function propose(s: Household, source: string, intent: Intent) {
   log(s, `Found ${affected.length} tasks that need a hand.`, "plan");
   say(
     s,
-    `You’ll be busy until ${clock(until)}, so I’ve checked who could help with the tasks you’ll miss. Have a look before we ask anyone.`,
+    `You’ll be busy until ${clock(until)}. I found a few people who might be able to cover your tasks. Check the suggestions before we ask them.`,
     plan.id,
     [
       "Today’s plans",
@@ -363,7 +363,7 @@ export function applyAction(state: Household, action: Action, intent?: Intent): 
       log(s, "Saved a household note.", "memory");
       say(
         s,
-        "Saved. If this changes who can help, update their free hours or permissions in Household too.",
+        "Saved. If it affects who can help, update their availability or permissions in Household too.",
       );
     } else if (i.kind === "disruption") propose(s, action.text, i);
     else
